@@ -1,44 +1,29 @@
 import os
+import time
+import requests
 from alpha_vantage.timeseries import TimeSeries
-import pandas as pd
-import matplotlib.pyplot as plt
 from dotenv import load_dotenv
 
-# Load API key from .env file
 load_dotenv()
-api_key = os.getenv('ALPHA_VANTAGE_API_KEY')
 
-# Initialize the Alpha Vantage TimeSeries
-ts = TimeSeries(key=api_key, output_format='pandas')
+ALPHA_KEY = os.getenv("ALPHA_VANTAGE_KEY")
+WEBHOOK_URL = os.getenv("DISCORD_WEBHOOK_URL")
 
-# Function to fetch stock data
-def fetch_stock_data(symbol, interval="daily"):
-    if interval == "daily":
-        data, meta_data = ts.get_daily(symbol=symbol, outputsize='compact')  # Use "full" for more data
-    elif interval == "intraday":
-        data, meta_data = ts.get_intraday(symbol=symbol, interval='15min', outputsize='compact')
-    else:
-        raise ValueError("Unsupported interval. Choose 'daily' or 'intraday'.")
-    return data, meta_data
+ts = TimeSeries(key=ALPHA_KEY, output_format='json')
 
-# Fetch and analyze data
-try:
-    ticker = "AAPL"  # Replace with your preferred stock symbol
-    print(f"Fetching data for {ticker}...")
-    data, meta_data = fetch_stock_data(ticker, interval="daily")
+# List of stocks to track
+stocks = ["AAPL", "TSLA", "GOOGL" "ASTS"]
 
-    # Display the first few rows
-    print(data.head())
-
-    # Save to CSV
-    data.to_csv(f"{ticker}_daily.csv")
-    print(f"Data saved to {ticker}_daily.csv")
-
-    # Plot the closing prices
-    data['4. close'].plot(title=f"{ticker} Daily Closing Prices")
-    plt.xlabel("Date")
-    plt.ylabel("Price")
-    plt.show()
-
-except Exception as e:
-    print(f"Error: {e}")
+while True:
+    for symbol in stocks:
+        try:
+            data, _ = ts.get_quote_endpoint(symbol=symbol)
+            price = data['05. price']
+            payload = {"content": f"{symbol} stock price: ${price}"}
+            response = requests.post(WEBHOOK_URL, json=payload)
+            response.raise_for_status()
+            print(f"{symbol} update sent!")
+        except Exception as e:
+            print(f"Failed to fetch/send {symbol}: {e}")
+    # Wait 5 minutes before sending next update
+    time.sleep(60 * 5)
