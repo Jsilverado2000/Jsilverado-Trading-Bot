@@ -3,3 +3,6 @@ pandas
 matplotlib
 python-dotenv
 requests
+git add requirements.txt
+git commit -m "Add requirements.txt"
+git push
