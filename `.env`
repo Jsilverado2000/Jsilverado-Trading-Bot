@@ -1,3 +1,3 @@
 # Example .env file
-ALPHA_VANTAGE_API_KEY=your_alpha_vantage_api_key
-DISCORD_WEBHOOK_URL=your_discord_webhook_url
+ALPHA_VANTAGE_API_KEY=2745FFC9ZWDGQE34
+DISCORD_WEBHOOK_URL=https://discord.com/api/webhooks/1428192761311662190/nVA89P_HVb5d5xUW4TrUfs5QmwoI8wWCEYGmTavQit9wsi7OxsdVJq9Oyw32WdC1WxdL
